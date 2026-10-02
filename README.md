@@ -1,6 +1,6 @@
 # SimpleFIN Budget App
 
-A zero-based budgeting app, in the spirit of EveryDollar. Every dollar of income gets assigned to a
+A zero-based budgeting app. Every dollar of income gets assigned to a
 category until there's nothing left unbudgeted, and every transaction gets logged against a category
 so you always know what's left to spend.
 
