@@ -1,0 +1,16 @@
+# Litestream streams every change to the SQLite database to Azure Blob Storage
+# (about once a second), so the container's disk can be thrown away: on start
+# the entrypoint restores the latest copy before the API opens it.
+#
+# Used only when LITESTREAM_ACCOUNT_NAME is set (see entrypoint.sh). The account
+# key comes from LITESTREAM_AZURE_ACCOUNT_KEY, which Litestream reads itself.
+dbs:
+  - path: ${DATABASE_PATH}
+    replica:
+      type: abs
+      account-name: ${LITESTREAM_ACCOUNT_NAME}
+      bucket: ${LITESTREAM_CONTAINER}
+      # Only for testing against the Azurite emulator; empty means Azure itself.
+      endpoint: ${LITESTREAM_ENDPOINT}
+      path: budget
+      sync-interval: 1s

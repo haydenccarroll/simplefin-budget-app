@@ -1,0 +1,24 @@
+.env
+.DS_Store
+
+# compiled binaries
+apps/budget-api/budget-api
+
+# node
+node_modules/
+.expo/
+dist/
+web-build/
+
+# go
+apps/budget-api/docs/
+
+# local SQLite databases
+*.db
+*.db-wal
+*.db-shm
+
+# editor / tool files
+.idea/
+__pycache__/
+.claude/

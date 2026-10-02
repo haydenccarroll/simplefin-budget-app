@@ -1,0 +1,21 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries:
+      - "internal/handlers/auth"
+      - "internal/handlers/budget"
+      - "internal/handlers/budgetadmin"
+      - "internal/handlers/simplefin"
+      - "internal/queue"
+    schema: "internal/database/migrations"
+    gen:
+      go:
+        package: "queries"
+        out: "internal/queries"
+        overrides:
+          # Keep IDs and counts the handlers pass around as int32, as before.
+          - db_type: "INTEGER"
+            go_type: "int32"
+          - db_type: "INTEGER"
+            go_type: "database/sql.NullInt32"
+            nullable: true

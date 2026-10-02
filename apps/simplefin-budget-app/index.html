@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- viewport-fit=cover lets the page reach under the notch and home indicator and makes
+         env(safe-area-inset-*) report real values, which is what the app's safe-area padding
+         (and the tab bar's) reads on the web. Without it the tab bar sits under the indicator. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- Added to the home screen on iOS, open full-screen like an app. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Budget" />
+    <meta name="theme-color" content="#fbf9ea" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>Bill and Dill's Eggcellent Budget</title>
+    <link rel="icon" href="/favicon.png" />
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style>
+      html,
+      body {
+        height: 100%;
+        background-color: #fbf9ea;
+        /* No rubber-band bounce, pull-to-refresh or swipe-to-go-back/forward of the whole page. The
+           viewport takes this from <html>, so it has to be here as well as on <body>: without it a
+           horizontal swipe (e.g. to the previous month) is taken as the browser's back gesture and
+           leaves the app for a blank page. */
+        overscroll-behavior: none;
+      }
+      body {
+        overflow: hidden;
+      }
+      #root {
+        display: flex;
+        /* --app-height is the space above the on-screen keyboard while it's open (see below). */
+        height: var(--app-height, 100%);
+        flex: 1;
+        /* While the keyboard is up, pin the app to the visible area (iOS may have scrolled the page). */
+        position: var(--app-position, static);
+        top: var(--app-top, 0);
+        left: 0;
+        right: 0;
+      }
+    </style>
+    <script>
+      // iOS doesn't shrink the page when the keyboard opens: it covers the bottom of the page and
+      // slides the whole page up. The app then still thinks it has the full screen, so a form's
+      // scroll view has nothing to scroll and the fields under the keyboard can't be reached. So
+      // while the keyboard is up, size the app to the visible area, put the page back at the top,
+      // and scroll the field being typed in into view inside the app's own scroll view.
+      (function () {
+        var viewport = window.visualViewport;
+        if (!viewport) return;
+        var root = document.documentElement;
+        function fit() {
+          var keyboardUp = window.innerHeight - viewport.height > 80;
+          if (keyboardUp) {
+            root.style.setProperty('--app-height', viewport.height + 'px');
+            root.style.setProperty('--app-position', 'fixed');
+            root.style.setProperty('--app-top', viewport.offsetTop + 'px');
+          } else {
+            root.style.removeProperty('--app-height');
+            root.style.removeProperty('--app-position');
+            root.style.removeProperty('--app-top');
+            window.scrollTo(0, 0);
+          }
+          var field = document.activeElement;
+          if (keyboardUp && field && /^(INPUT|TEXTAREA|SELECT)$/.test(field.tagName)) {
+            requestAnimationFrame(function () {
+              field.scrollIntoView({ block: 'center' });
+            });
+          }
+        }
+        viewport.addEventListener('resize', fit);
+        // Follow iOS moving the visual viewport instead of fighting it (which snapped the page back).
+        viewport.addEventListener('scroll', fit);
+      })();
+    </script>
+  </head>
+
+  <body>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/index.jsx"></script>
+  </body>
+</html>
